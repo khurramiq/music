@@ -1,0 +1,247 @@
+._1VgeC {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+  justify-content: space-around;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px;
+}
+
+._2yxNK {
+  text-align: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-flex: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  padding: 0 20px;
+  max-width: 700px;
+}
+
+.z8Plx {
+  margin-top: 80px;
+  width: 100%;
+}
+
+.J4CLR {
+  margin-bottom: 20px;
+}
+
+._2KOJq {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+._1hnuK,
+._1hnuK:visited {
+  color: #fff;
+}
+
+._1hnuK {
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+._39ITX {
+  height: 70px;
+  min-width: 70px;
+  font-size: 18px;
+  padding: 0 40px;
+}
+
+._2KOJq {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+button.P8Lj3 > span {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+._2Zt7D {
+  margin: 0 0 20px 0;
+  color: #fff;
+}
+
+@media (max-width: 1580px) {
+  ._1CKAi {
+    font-size: 50px;
+  }
+}
+
+._1CKAi {
+  font-weight: 200;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  font-size: 60px;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.015em;
+}
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;  
+}
+
+._116I0 {
+  font-size: 16px;
+  margin: 0 0 20px 0;
+  color: #fff;
+}
+
+._2BWz1 {
+  font-size: 16px;
+  margin-bottom: 25px;
+  color: #fff;
+}
+
+._16jqA {
+  position: relative;
+  display: inline-block;
+}
+
+.z8Plx {
+  margin-top: 80px;
+  width: 100%;
+}
+
+._3mKS0,
+.Ymfk9 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1260px;
+  margin: 0 auto;
+}
+
+._3mKS0 > *:not(:last-child),
+.Ymfk9 > *:not(:last-child) {
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+._3mKS0 > *,
+.Ymfk9 > * {
+  -webkit-box-flex: 1;
+  -ms-flex: 1 1 0%;
+  flex: 1 1 0%;
+  padding: 0 10px;
+}
+
+._1psnD {
+  height: 90px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+._1psnD .yukoJ {
+  display: block;
+  height: 60px;
+  font-size: 32px;
+  font-weight: 200;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  color: #fff;
+}
+
+._1psnD ._3jvt5 {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #b4b4b5;
+}
+
+.Sr81W,
+.Sr81W:visited {
+  color: #fff;
+}
+
+.Sr81W {
+  background: #dcad54;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+._3GnAa {
+  height: 40px;
+  min-width: 40px;
+  padding: 0 20px;
+}
+
+._2Kym9 {
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+._3ZGgq:hover,
+._3ZGgq:visited:hover {
+  color: #c29441;
+}
+
+._3ZGgq,
+._3ZGgq:visited {
+  color: #dcad54;
+}
+
+._11MAo {
+  background-position: 50% 0;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+}
+
+.dtlplay {
+  border: 1px solid #fff;
+  opacity: 0.5;
+}
+.dtlplay:hover {
+  border: 2px solid #fff;
+  opacity: 1;
+}

@@ -1,0 +1,23 @@
+.song_title {
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+}
+.song_title:hover {
+  color: #dcad54;
+}
+
+.by {
+  color: #fff;
+  opacity: 0.5;
+}
+
+.song_by {
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.song_by:hover {
+  color: #dcad54;
+}
