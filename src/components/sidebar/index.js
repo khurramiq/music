@@ -2,18 +2,11 @@ import React, { useState, useLayoutEffect, useEffect } from "react";
 import MyRangeSlider from "./components/myRangeSlider";
 import FilterItem from "./components/filterItem";
 import "./sidebar.css";
-import { useHistory } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
-import { musicConstants } from "../../redux/constants";
-const {  
-  FILTERED_FILTERS,
-} = musicConstants;
+import { useHistory, useLocation } from "react-router-dom";
+import queryString from "query-string";
 
 const Sidebar = ({
   openSideBar,
-  // filteredFilters,
-  // setFilteredFilters,
   genreFilters,
   setGenreFilters,
   vocalFilters,
@@ -27,9 +20,9 @@ const Sidebar = ({
   bpmValue,
   setbpmValue,
   addDeleteUrl,
-  toggleSideBar
+  toggleSideBar,
 }) => {
-  const dispatch = useDispatch();
+  let location = useLocation();  
   function useWindowSize() {
     const [size, setSize] = useState([0, 0]);
     useLayoutEffect(() => {
@@ -44,8 +37,7 @@ const Sidebar = ({
   }
   // eslint-disable-next-line no-unused-vars
   const [width, height] = useWindowSize();
-
-  const _music = useSelector((state) => state.music);
+  
   let history = useHistory();
   //   ============== STATES START ============   //
   // Filter Toggle States
@@ -58,486 +50,469 @@ const Sidebar = ({
 
   //   ============== STATES END ============   //
 
-  //   ============== SELECTION FUNCTIONS START ============   //
-  // Is parent in selected list
-  const isParentInList = (title) => {
-    for (let i = 0; i < _music.filteredFilters.length; i++) {
-      if (_music.filteredFilters[i].filterTitle === title) {
-        return true;
+  //   ============== SELECTION FUNCTIONS START ============   //  
+
+  const isAlreadySelected = (title, filterType) => {
+    let title1 = title.replace(/\s+/g, "-").toLowerCase();
+    let params = queryString.parse(location.search);
+    if (filterType === "genres") {
+      if (params.genres) {
+        if (Array.isArray(params.genres)) {
+          for (let i = 0; i < params.genres.length; i++) {
+            if (title1 === params.genres[i]) {
+              return true;
+            }
+          }
+          return false;
+        } else {
+          if (title1 === params.genres) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      } else {
+        return false;
       }
     }
-    return false;
+    else if (filterType === "vocals") {
+      if (params.vocals) {
+        if (Array.isArray(params.vocals)) {
+          for (let i = 0; i < params.vocals.length; i++) {
+            if (title1 === params.vocals[i]) {
+              return true;
+            }
+          }
+          return false;
+        } else {
+          if (title1 === params.vocals) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      } else {
+        return false;
+      }
+    }
+    else if (filterType === "moods") {
+      if (params.moods) {
+        if (Array.isArray(params.moods)) {
+          for (let i = 0; i < params.moods.length; i++) {
+            if (title1 === params.moods[i]) {
+              return true;
+            }
+          }
+          return false;
+        } else {
+          if (title1 === params.moods) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      } else {
+        return false;
+      }
+    }
+    else if (filterType === "artists") {
+      if (params.artists) {
+        if (Array.isArray(params.artists)) {
+          for (let i = 0; i < params.artists.length; i++) {
+            if (title1 === params.artists[i]) {
+              return true;
+            }
+          }
+          return false;
+        } else {
+          if (title1 === params.artists) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      } else {
+        return false;
+      }
+    }
+    else if (filterType === "instruments") {
+      if (params.instruments) {
+        if (Array.isArray(params.instruments)) {
+          for (let i = 0; i < params.instruments.length; i++) {
+            if (title1 === params.instruments[i]) {
+              return true;
+            }
+          }
+          return false;
+        } else {
+          if (title1 === params.instruments) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      } else {
+        return false;
+      }
+    }
   };
 
   // Handle vocal filter selection
   const handleGenreFiltersSelect = (filterText, selectionChange) => {
-    let tempArray = [...genreFilters];
-    for (let i = 0; i < tempArray.length; i++) {
-      // Parent Selection
-      if (tempArray[i].filterText === filterText) {
-        // If Selection Is true
-        if (selectionChange) {
-          tempArray[i] = { ...tempArray[i], filtered: selectionChange };          
-          dispatch({ type: FILTERED_FILTERS, payload: [
-            ..._music.filteredFilters,
-            {
-              filterType: "genre",
-              filterTitle: filterText,
-            },
-          ] });
-          let query = addDeleteUrl(filterText, true, "genre");
-          if (_music.filteredFilters.length === 0) {
-            query += `${filterText.replace(/\s+/g, "-").toLowerCase()}`;
-            history.push(`/royalty-free-music?geners=${query}`);
-          } else {
-            query += `&geners=${filterText.replace(/\s+/g, "-").toLowerCase()}`;
-            history.push(`/royalty-free-music?${query}`);
-          }
-        }
-        // If Selection Is false
-        else {          
-          dispatch({ type: FILTERED_FILTERS, payload: _music.filteredFilters.filter((item) => item.filterTitle !== filterText) });
-          tempArray[i] = { ...tempArray[i], filtered: selectionChange };
-          for (let j = 0; j < tempArray[i]?.subFilters?.length; j++) {
-            tempArray[i].subFilters[j] = {
-              ...tempArray[i].subFilters[j],
-              filtered: selectionChange,
-            };
-          }
-          let query = addDeleteUrl(filterText, false, "genre");
-          if (_music.filteredFilters.length > 1) {
-            history.push(`/royalty-free-music?${query}`);
-          } else {
-            history.push(`/royalty-free-music`);
-          }
-        }
-        break;
+    if (!isAlreadySelected(filterText, "genres")) {
+      if (location.search) {
+        history.push(
+          `${location.search}&genres=${filterText
+            .replace(/\s+/g, "-")
+            .toLowerCase()}`
+        );
+      } else {
+        history.push(
+          `/royalty-free-music?genres=${filterText
+            .replace(/\s+/g, "-")
+            .toLowerCase()}`
+        );
       }
-      // Child Selection
-      else {
-        for (let j = 0; j < tempArray[i]?.subFilters?.length; j++) {
-          if (tempArray[i]?.subFilters[j]?.filterText === filterText) {
-            // If Selection is true
-            if (selectionChange) {
-              tempArray[i] = { ...tempArray[i], filtered: selectionChange };
-              tempArray[i].subFilters[j] = {
-                ...tempArray[i].subFilters[j],
-                filtered: selectionChange,
-              };
-              dispatch({ type: FILTERED_FILTERS, payload: [
-                ..._music.filteredFilters,
-                {
-                  filterType: "genre",
-                  filterTitle: filterText,
-                },
-              ] });
-              let query = addDeleteUrl(filterText, true, "genre");
-              if (_music.filteredFilters.length === 0) {
-                query += `${filterText.replace(/\s+/g, "-").toLowerCase()}`;
-                history.push(`/royalty-free-music?geners=${query}`);
-              } else {
-                query += `&geners=${filterText
-                  .replace(/\s+/g, "-")
-                  .toLowerCase()}`;
-                history.push(`/royalty-free-music?${query}`);
+    } else {
+      let params = queryString.parse(location.search);
+      let newquery = "";
+      let text = filterText.replace(/\s+/g, "-").toLowerCase();
+      for (let i = 0; i < Object.keys(params).length; i++) {
+        if (Object.keys(params)[i] === "genres") {
+          console.log(params.genres);
+          if (Array.isArray(params.genres)) {
+            for (let i = 0; i < params.genres.length; i++) {
+              if (params.genres[i] !== text) {
+                newquery += `&genres=${params.genres[i]}`;
               }
             }
-            // If Selection is false
-            else {
-              if (!isParentInList(tempArray[i].filterText)) {
-                tempArray[i] = { ...tempArray[i], filtered: false };
-              }
-              dispatch({ type: FILTERED_FILTERS, payload: _music.filteredFilters.filter((item) => item.filterTitle !== filterText) });
-              tempArray[i].subFilters[j] = {
-                ...tempArray[i].subFilters[j],
-                filtered: selectionChange,
-              };
-              let query = addDeleteUrl(filterText, false, "genre");
-              if (_music.filteredFilters.length > 1) {
-                history.push(`/royalty-free-music?${query}`);
-              } else {
-                history.push(`/royalty-free-music`);
-              }
+          }
+        } else if (Object.keys(params)[i] === "vocals") {
+          console.log(params.genres);
+          if (Array.isArray(params.vocals)) {
+            for (let i = 0; i < params.vocals.length; i++) {
+              newquery += `&vocals=${params.vocals[i]}`;
             }
-            break;
+          } else {
+            newquery += `&vocals=${params.vocals}`;
+          }
+        } else if (Object.keys(params)[i] === "moods") {
+          if (Array.isArray(params.moods)) {
+            for (let i = 0; i < params.moods.length; i++) {
+              newquery += `&moods=${params.moods[i]}`;
+            }
+          } else {
+            newquery += `&moods=${params.moods}`;
+          }
+        }
+        else if (Object.keys(params)[i] === "artists") {          
+          if (Array.isArray(params.artists)) {
+            for (let i = 0; i < params.artists.length; i++) {
+              newquery += `&artists=${params.artists[i]}`;
+            }
+          } else {
+            newquery += `&artists=${params.artists}`;
+          }
+        }
+        else if (Object.keys(params)[i] === "instruments") {
+          console.log(params.instruments);
+          if (Array.isArray(params.instruments)) {
+            for (let i = 0; i < params.instruments.length; i++) {
+              newquery += `&instruments=${params.instruments[i]}`;
+            }
+          } else {
+            newquery += `&instruments=${params.instruments}`;
           }
         }
       }
+      history.push(`/royalty-free-music?${newquery}`);
     }
-    setGenreFilters(tempArray);
   };
   // Handle vocal filter selection
   const handleVocalFiltersSelect = (filterText, selectionChange) => {
-    let tempArray = [...vocalFilters];
-    for (let i = 0; i < tempArray.length; i++) {
-      // Parent Selection
-      if (tempArray[i].filterText === filterText) {
-        // If Selection Is true
-        if (selectionChange) {
-          tempArray[i] = { ...tempArray[i], filtered: selectionChange };          
-          dispatch({ type: FILTERED_FILTERS, payload: [
-            ..._music.filteredFilters,
-            {
-              filterType: "vocal",
-              filterTitle: filterText,
-            },
-          ] });
-          let query = addDeleteUrl(filterText, true, "vocal");
-          if (_music.filteredFilters.length === 0) {
-            query += `${filterText.replace(/\s+/g, "-").toLowerCase()}`;
-            history.push(`/royalty-free-music?vocals=${query}`);
-          } else {
-            query += `&vocals=${filterText.replace(/\s+/g, "-").toLowerCase()}`;
-            history.push(`/royalty-free-music?${query}`);
-          }
-        }
-        // If Selection Is false
-        else {          
-          dispatch({ type: FILTERED_FILTERS, payload: _music.filteredFilters.filter((item) => item.filterTitle !== filterText) });
-          tempArray[i] = { ...tempArray[i], filtered: selectionChange };
-          for (let j = 0; j < tempArray[i]?.subFilters?.length; j++) {
-            tempArray[i].subFilters[j] = {
-              ...tempArray[i].subFilters[j],
-              filtered: selectionChange,
-            };
-          }
-          let query = addDeleteUrl(filterText, false, "vocal");
-          if (_music.filteredFilters.length > 1) {
-            history.push(`/royalty-free-music?${query}`);
-          } else {
-            history.push(`/royalty-free-music`);
-          }
-        }
-        break;
+    if (!isAlreadySelected(filterText, "vocals")) {
+      if (location.search) {
+        history.push(
+          `${location.search}&vocals=${filterText
+            .replace(/\s+/g, "-")
+            .toLowerCase()}`
+        );
+      } else {
+        history.push(
+          `/royalty-free-music?vocals=${filterText
+            .replace(/\s+/g, "-")
+            .toLowerCase()}`
+        );
       }
-      // Child Selection
-      else {
-        for (let j = 0; j < tempArray[i]?.subFilters?.length; j++) {
-          if (tempArray[i]?.subFilters[j]?.filterText === filterText) {
-            // If Selection is true
-            if (selectionChange) {
-              tempArray[i] = { ...tempArray[i], filtered: selectionChange };
-              tempArray[i].subFilters[j] = {
-                ...tempArray[i].subFilters[j],
-                filtered: selectionChange,
-              };              
-              dispatch({ type: FILTERED_FILTERS, payload: [
-                ..._music.filteredFilters,
-                {
-                  filterType: "vocal",
-                  filterTitle: filterText,
-                },
-              ] });
-            }
-            // If Selection is false
-            else {
-              if (!isParentInList(tempArray[i].filterText)) {
-                tempArray[i] = { ...tempArray[i], filtered: false };
+    } else {
+      let params = queryString.parse(location.search);
+      let newquery = "";
+      let text = filterText.replace(/\s+/g, "-").toLowerCase();
+      for (let i = 0; i < Object.keys(params).length; i++) {
+        if (Object.keys(params)[i] === "vocals") {
+          if (Array.isArray(params.vocals)) {
+            for (let i = 0; i < params.vocals.length; i++) {
+              if (params.vocals[i] !== text) {
+                newquery += `&vocals=${params.vocals[i]}`;
               }
-              dispatch({ type: FILTERED_FILTERS, payload: _music.filteredFilters.filter((item) => item.filterTitle !== filterText) });
-              tempArray[i].subFilters[j] = {
-                ...tempArray[i].subFilters[j],
-                filtered: selectionChange,
-              };
             }
-            break;
+          }
+        } else if (Object.keys(params)[i] === "genres") {
+          if (Array.isArray(params.genres)) {
+            for (let i = 0; i < params.genres.length; i++) {
+              newquery += `&genres=${params.genres[i]}`;
+            }
+          } else {
+            newquery += `&genres=${params.genres}`;
+          }
+        } else if (Object.keys(params)[i] === "moods") {
+          if (Array.isArray(params.moods)) {
+            for (let i = 0; i < params.moods.length; i++) {
+              newquery += `&moods=${params.moods[i]}`;
+            }
+          } else {
+            newquery += `&moods=${params.moods}`;
+          }
+        }
+        else if (Object.keys(params)[i] === "artists") {          
+          if (Array.isArray(params.artists)) {
+            for (let i = 0; i < params.artists.length; i++) {
+              newquery += `&artists=${params.artists[i]}`;
+            }
+          } else {
+            newquery += `&artists=${params.artists}`;
+          }
+        }
+        else if (Object.keys(params)[i] === "instruments") {
+          console.log(params.instruments);
+          if (Array.isArray(params.instruments)) {
+            for (let i = 0; i < params.instruments.length; i++) {
+              newquery += `&instruments=${params.instruments[i]}`;
+            }
+          } else {
+            newquery += `&instruments=${params.instruments}`;
           }
         }
       }
+      history.push(`/royalty-free-music?${newquery}`);
     }
-    setVocalFilters(tempArray);
   };
   // Handle mood filter selection
   const handleMoodFiltersSelect = (filterText, selectionChange) => {
-    let tempArray = [...moodFilters];
-    for (let i = 0; i < tempArray.length; i++) {
-      // Parent Selection
-      if (tempArray[i].filterText === filterText) {
-        // If Selection Is true
-        if (selectionChange) {
-          tempArray[i] = { ...tempArray[i], filtered: selectionChange };          
-          dispatch({ type: FILTERED_FILTERS, payload: [
-            ..._music.filteredFilters,
-            {
-              filterType: "mood",
-              filterTitle: filterText,
-            },
-          ] });
-          let query = addDeleteUrl(filterText, true, "mood");
-          if (_music.filteredFilters.length === 0) {
-            query += `${filterText.replace(/\s+/g, "-").toLowerCase()}`;
-            history.push(`/royalty-free-music?moods=${query}`);
-          } else {
-            query += `&moods=${filterText.replace(/\s+/g, "-").toLowerCase()}`;
-            history.push(`/royalty-free-music?${query}`);
-          }
-        }
-        // If Selection Is false
-        else {          
-          dispatch({ type: FILTERED_FILTERS, payload: _music.filteredFilters.filter((item) => item.filterTitle !== filterText) });
-          tempArray[i] = { ...tempArray[i], filtered: selectionChange };
-          for (let j = 0; j < tempArray[i]?.subFilters?.length; j++) {
-            tempArray[i].subFilters[j] = {
-              ...tempArray[i].subFilters[j],
-              filtered: selectionChange,
-            };
-          }
-          let query = addDeleteUrl(filterText, false, "mood");
-          if (_music.filteredFilters.length > 1) {
-            history.push(`/royalty-free-music?${query}`);
-          } else {
-            history.push(`/royalty-free-music`);
-          }
-        }
-        break;
+    if (!isAlreadySelected(filterText, "moods")) {
+      if (location.search) {
+        history.push(
+          `${location.search}&moods=${filterText
+            .replace(/\s+/g, "-")
+            .toLowerCase()}`
+        );
       } else {
-        for (let j = 0; j < tempArray[i]?.subFilters?.length; j++) {
-          // Child Selection
-          if (tempArray[i]?.subFilters[j]?.filterText === filterText) {
-            // If Selection is true
-            if (selectionChange) {
-              tempArray[i] = { ...tempArray[i], filtered: selectionChange };
-              tempArray[i].subFilters[j] = {
-                ...tempArray[i].subFilters[j],
-                filtered: selectionChange,
-              };              
-              dispatch({ type: FILTERED_FILTERS, payload: [
-                ..._music.filteredFilters,
-                {
-                  filterType: "mood",
-                  filterTitle: filterText,
-                },
-              ] });
-              let query = addDeleteUrl(filterText, true, "mood");
-              if (_music.filteredFilters.length === 0) {
-                query += `${filterText.replace(/\s+/g, "-").toLowerCase()}`;
-                history.push(`/royalty-free-music?moods=${query}`);
-              } else {
-                query += `&moods=${filterText
-                  .replace(/\s+/g, "-")
-                  .toLowerCase()}`;
-                history.push(`/royalty-free-music?${query}`);
+        history.push(
+          `/royalty-free-music?moods=${filterText
+            .replace(/\s+/g, "-")
+            .toLowerCase()}`
+        );
+      }
+    } else {
+      let params = queryString.parse(location.search);
+      let newquery = "";
+      let text = filterText.replace(/\s+/g, "-").toLowerCase();
+      for (let i = 0; i < Object.keys(params).length; i++) {
+        if (Object.keys(params)[i] === "moods") {          
+          if (Array.isArray(params.moods)) {
+            for (let i = 0; i < params.moods.length; i++) {
+              if (params.moods[i] !== text) {
+                newquery += `&moods=${params.moods[i]}`;
               }
             }
-            // If Selection is false
-            else {
-              if (!isParentInList(tempArray[i].filterText)) {
-                tempArray[i] = { ...tempArray[i], filtered: false };
-              }              
-              dispatch({ type: FILTERED_FILTERS, payload: _music.filteredFilters.filter(
-                (item) => item.filterTitle !== filterText
-              ) });
-              tempArray[i].subFilters[j] = {
-                ...tempArray[i].subFilters[j],
-                filtered: selectionChange,
-              };
-              let query = addDeleteUrl(filterText, false, "mood");
-              if (_music.filteredFilters.length > 1) {
-                history.push(`/royalty-free-music?${query}`);
-              } else {
-                history.push(`/royalty-free-music`);
-              }
+          }
+        } else if (Object.keys(params)[i] === "genres") {
+          console.log(params.genres);
+          if (Array.isArray(params.genres)) {
+            for (let i = 0; i < params.genres.length; i++) {
+              newquery += `&genres=${params.genres[i]}`;
             }
-            break;
+          } else {
+            newquery += `&genres=${params.genres}`;
+          }
+        }
+        else if (Object.keys(params)[i] === "vocals") {          
+          if (Array.isArray(params.vocals)) {
+            for (let i = 0; i < params.vocals.length; i++) {
+              newquery += `&vocals=${params.vocals[i]}`;
+            }
+          } else {
+            newquery += `&vocals=${params.vocals}`;
+          }
+        }
+        else if (Object.keys(params)[i] === "artists") {          
+          if (Array.isArray(params.artists)) {
+            for (let i = 0; i < params.artists.length; i++) {
+              newquery += `&artists=${params.artists[i]}`;
+            }
+          } else {
+            newquery += `&artists=${params.artists}`;
+          }
+        }
+        else if (Object.keys(params)[i] === "instruments") {
+          console.log(params.instruments);
+          if (Array.isArray(params.instruments)) {
+            for (let i = 0; i < params.instruments.length; i++) {
+              newquery += `&instruments=${params.instruments[i]}`;
+            }
+          } else {
+            newquery += `&instruments=${params.instruments}`;
           }
         }
       }
+      history.push(`/royalty-free-music?${newquery}`);
     }
-    setMoodFilters(tempArray);
   };
   // Handle artist filter selection
-  const handleArtistFiltersSelect = (filterText, selectionChange) => {
-    let tempArray = [...artistFilters];
-    for (let i = 0; i < tempArray.length; i++) {
-      // Parent Selection
-      if (tempArray[i].filterText === filterText) {
-        // If Selection Is true
-        if (selectionChange) {
-          tempArray[i] = { ...tempArray[i], filtered: selectionChange };          
-          dispatch({ type: FILTERED_FILTERS, payload: [
-            ..._music.filteredFilters,
-            {
-              filterType: "artist",
-              filterTitle: filterText,
-            },
-          ] });
-          let query = addDeleteUrl(filterText, true, "artist");
-          if (_music.filteredFilters.length === 0) {
-            query += `${filterText.replace(/\s+/g, "-").toLowerCase()}`;
-            history.push(`/royalty-free-music?artists=${query}`);
-          } else {
-            query += `&artists=${filterText
-              .replace(/\s+/g, "-")
-              .toLowerCase()}`;
-            history.push(`/royalty-free-music?${query}`);
-          }
-        }
-        // If Selection Is false
-        else {          
-          dispatch({ type: FILTERED_FILTERS, payload: _music.filteredFilters.filter((item) => item.filterTitle !== filterText) });
-          tempArray[i] = { ...tempArray[i], filtered: selectionChange };
-          for (let j = 0; j < tempArray[i]?.subFilters?.length; j++) {
-            tempArray[i].subFilters[j] = {
-              ...tempArray[i].subFilters[j],
-              filtered: selectionChange,
-            };
-          }
-          let query = addDeleteUrl(filterText, false, "artist");
-          if (_music.filteredFilters.length > 1) {
-            history.push(`/royalty-free-music?${query}`);
-          } else {
-            history.push(`/royalty-free-music`);
-          }
-        }
-        break;
+  const handleArtistFiltersSelect = (filterText, selectionChange) => {    
+    if (!isAlreadySelected(filterText, "artists")) {
+      if (location.search) {
+        history.push(
+          `${location.search}&artists=${filterText
+            .replace(/\s+/g, "-")
+            .toLowerCase()}`
+        );
       } else {
-        for (let j = 0; j < tempArray[i]?.subFilters?.length; j++) {
-          // Child Selection
-          if (tempArray[i]?.subFilters[j]?.filterText === filterText) {
-            // If Selection is true
-            if (selectionChange) {
-              tempArray[i] = { ...tempArray[i], filtered: selectionChange };
-              tempArray[i].subFilters[j] = {
-                ...tempArray[i].subFilters[j],
-                filtered: selectionChange,
-              };              
-              dispatch({ type: FILTERED_FILTERS, payload: [
-                ..._music.filteredFilters,
-                {
-                  filterType: "artist",
-                  filterTitle: filterText,
-                },
-              ] });
-              let query = addDeleteUrl(filterText, true, "artist");
-              if (_music.filteredFilters.length === 0) {
-                query += `${filterText.replace(/\s+/g, "-").toLowerCase()}`;
-                history.push(`/royalty-free-music?artists=${query}`);
-              } else {
-                query += `&artists=${filterText
-                  .replace(/\s+/g, "-")
-                  .toLowerCase()}`;
-                history.push(`/royalty-free-music?${query}`);
+        history.push(
+          `/royalty-free-music?artists=${filterText
+            .replace(/\s+/g, "-")
+            .toLowerCase()}`
+        );
+      }
+    } else {
+      let params = queryString.parse(location.search);
+      let newquery = "";
+      let text = filterText.replace(/\s+/g, "-").toLowerCase();
+      for (let i = 0; i < Object.keys(params).length; i++) {
+        if (Object.keys(params)[i] === "artists") {          
+          if (Array.isArray(params.artists)) {
+            for (let i = 0; i < params.artists.length; i++) {
+              if (params.artists[i] !== text) {
+                newquery += `&artists=${params.artists[i]}`;
               }
             }
-            // If Selection is false
-            else {
-              if (!isParentInList(tempArray[i].filterText)) {
-                tempArray[i] = { ...tempArray[i], filtered: false };
-              }              
-              dispatch({ type: FILTERED_FILTERS, payload: _music.filteredFilters.filter(
-                (item) => item.filterTitle !== filterText
-              ) });
-              tempArray[i].subFilters[j] = {
-                ...tempArray[i].subFilters[j],
-                filtered: selectionChange,
-              };
-              let query = addDeleteUrl(filterText, false, "artist");
-              if (_music.filteredFilters.length > 1) {
-                history.push(`/royalty-free-music?${query}`);
-              } else {
-                history.push(`/royalty-free-music`);
-              }
+          }
+        } else if (Object.keys(params)[i] === "genres") {
+          console.log(params.genres);
+          if (Array.isArray(params.genres)) {
+            for (let i = 0; i < params.genres.length; i++) {
+              newquery += `&genres=${params.genres[i]}`;
             }
-            break;
+          } else {
+            newquery += `&genres=${params.genres}`;
+          }
+        }
+        else if (Object.keys(params)[i] === "vocals") {
+          console.log(params.genres);
+          if (Array.isArray(params.vocals)) {
+            for (let i = 0; i < params.vocals.length; i++) {
+              newquery += `&vocals=${params.vocals[i]}`;
+            }
+          } else {
+            newquery += `&vocals=${params.vocals}`;
+          }
+        }
+        else if (Object.keys(params)[i] === "moods") {
+          console.log(params.moods);
+          if (Array.isArray(params.moods)) {
+            for (let i = 0; i < params.moods.length; i++) {
+              newquery += `&moods=${params.moods[i]}`;
+            }
+          } else {
+            newquery += `&moods=${params.moods}`;
+          }
+        }
+        else if (Object.keys(params)[i] === "instruments") {
+          console.log(params.instruments);
+          if (Array.isArray(params.instruments)) {
+            for (let i = 0; i < params.instruments.length; i++) {
+              newquery += `&instruments=${params.instruments[i]}`;
+            }
+          } else {
+            newquery += `&instruments=${params.instruments}`;
           }
         }
       }
+      history.push(`/royalty-free-music?${newquery}`);
     }
-    setArtistFilters(tempArray);
   };
   // Handle instrument filter selection
-  const handleInstrumentFiltersSelect = (filterText, selectionChange) => {
-    let tempArray = [...instrumentFilters];
-    for (let i = 0; i < tempArray.length; i++) {
-      // Parent Selection
-      if (tempArray[i].filterText === filterText) {
-        // If Selection Is true
-        if (selectionChange) {
-          tempArray[i] = { ...tempArray[i], filtered: selectionChange };          
-          dispatch({ type: FILTERED_FILTERS, payload: [
-            ..._music.filteredFilters,
-            {
-              filterType: "instrument",
-              filterTitle: filterText,
-            },
-          ] });
-          let query = addDeleteUrl(filterText, true, "instrument");
-          if (_music.filteredFilters.length === 0) {
-            query += `${filterText.replace(/\s+/g, "-").toLowerCase()}`;
-            history.push(`/royalty-free-music?instruments=${query}`);
-          } else {
-            query += `&instruments=${filterText
-              .replace(/\s+/g, "-")
-              .toLowerCase()}`;
-            history.push(`/royalty-free-music?${query}`);
-          }
-        }
-        // If Selection Is false
-        else {          
-          dispatch({ type: FILTERED_FILTERS, payload: _music.filteredFilters.filter((item) => item.filterTitle !== filterText) });
-          tempArray[i] = { ...tempArray[i], filtered: selectionChange };
-          for (let j = 0; j < tempArray[i]?.subFilters?.length; j++) {
-            tempArray[i].subFilters[j] = {
-              ...tempArray[i].subFilters[j],
-              filtered: selectionChange,
-            };
-          }
-          let query = addDeleteUrl(filterText, false, "instrument");
-          if (_music.filteredFilters.length > 1) {
-            history.push(`/royalty-free-music?${query}`);
-          } else {
-            history.push(`/royalty-free-music`);
-          }
-        }
-        break;
+  const handleInstrumentFiltersSelect = (filterText, selectionChange) => {    
+    if (!isAlreadySelected(filterText, "instruments")) {
+      if (location.search) {
+        history.push(
+          `${location.search}&instruments=${filterText
+            .replace(/\s+/g, "-")
+            .toLowerCase()}`
+        );
       } else {
-        for (let j = 0; j < tempArray[i]?.subFilters?.length; j++) {
-          // Child Selection
-          if (tempArray[i]?.subFilters[j]?.filterText === filterText) {
-            // If Selection is true
-            if (selectionChange) {
-              tempArray[i] = { ...tempArray[i], filtered: selectionChange };
-              tempArray[i].subFilters[j] = {
-                ...tempArray[i].subFilters[j],
-                filtered: selectionChange,
-              };              
-              dispatch({ type: FILTERED_FILTERS, payload: [
-                ..._music.filteredFilters,
-                {
-                  filterType: "instrument",
-                  filterTitle: filterText,
-                },
-              ] });
-              let query = addDeleteUrl(filterText, true, "instrument");
-              if (_music.filteredFilters.length === 0) {
-                query += `${filterText.replace(/\s+/g, "-").toLowerCase()}`;
-                history.push(`/royalty-free-music?instruments=${query}`);
-              } else {
-                query += `&instruments=${filterText
-                  .replace(/\s+/g, "-")
-                  .toLowerCase()}`;
-                history.push(`/royalty-free-music?${query}`);
+        history.push(
+          `/royalty-free-music?instruments=${filterText
+            .replace(/\s+/g, "-")
+            .toLowerCase()}`
+        );
+      }
+    } else {
+      let params = queryString.parse(location.search);
+      let newquery = "";
+      let text = filterText.replace(/\s+/g, "-").toLowerCase();
+      for (let i = 0; i < Object.keys(params).length; i++) {
+        if (Object.keys(params)[i] === "instruments") {          
+          if (Array.isArray(params.instruments)) {
+            for (let i = 0; i < params.instruments.length; i++) {
+              if (params.instruments[i] !== text) {
+                newquery += `&instruments=${params.instruments[i]}`;
               }
             }
-            // If Selection is false
-            else {
-              tempArray[i].subFilters[j] = {
-                ...tempArray[i].subFilters[j],
-                filtered: selectionChange,
-              };
-              let query = addDeleteUrl(filterText, false, "instrument");
-              if (_music.filteredFilters.length > 1) {
-                history.push(`/royalty-free-music?${query}`);
-              } else {
-                history.push(`/royalty-free-music`);
-              }
+          }
+        } else if (Object.keys(params)[i] === "genres") {
+          console.log(params.genres);
+          if (Array.isArray(params.genres)) {
+            for (let i = 0; i < params.genres.length; i++) {
+              newquery += `&genres=${params.genres[i]}`;
             }
-            break;
+          } else {
+            newquery += `&genres=${params.genres}`;
+          }
+        }
+        else if (Object.keys(params)[i] === "vocals") {
+          console.log(params.genres);
+          if (Array.isArray(params.vocals)) {
+            for (let i = 0; i < params.vocals.length; i++) {
+              newquery += `&vocals=${params.vocals[i]}`;
+            }
+          } else {
+            newquery += `&vocals=${params.vocals}`;
+          }
+        }
+        else if (Object.keys(params)[i] === "moods") {
+          console.log(params.moods);
+          if (Array.isArray(params.moods)) {
+            for (let i = 0; i < params.moods.length; i++) {
+              newquery += `&moods=${params.moods[i]}`;
+            }
+          } else {
+            newquery += `&moods=${params.moods}`;
+          }
+        }
+        else if (Object.keys(params)[i] === "artists") {
+          console.log(params.artists);
+          if (Array.isArray(params.artists)) {
+            for (let i = 0; i < params.artists.length; i++) {
+              newquery += `&artists=${params.artists[i]}`;
+            }
+          } else {
+            newquery += `&artists=${params.artists}`;
           }
         }
       }
+      history.push(`/royalty-free-music?${newquery}`);
     }
-    setInstrumentFilters(tempArray);
   };
   //   ============== SELECTION FUNCTIONS END ============   //
 
@@ -571,10 +546,10 @@ const Sidebar = ({
 
   useEffect(() => {
     if (width <= 768) {
-      toggleSideBar()
+      toggleSideBar();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -583,15 +558,36 @@ const Sidebar = ({
         style={
           openSideBar
             ? width <= 768
-              ? { position: "fixed", top: 70, bottom: 0, display: "block", zIndex:'100' }
+              ? {
+                  position: "fixed",
+                  top: 70,
+                  bottom: 0,
+                  display: "block",
+                  zIndex: "100",
+                }
               : { display: "block" }
             : { display: "none" }
         }
         className="_1wFdm _2GnP1"
       >
-        <div style={width <= 768?{textAlign: "right", color: "white", paddingRight:'20px', paddingTop:'20px'}:{display:'none'}}>
-          <svg width={24} height={24} viewBox="0 0 24 24" style={{ cursor: 'pointer' }}
-          onClick={()=>toggleSideBar()}
+        <div
+          style={
+            width <= 768
+              ? {
+                  textAlign: "right",
+                  color: "white",
+                  paddingRight: "20px",
+                  paddingTop: "20px",
+                }
+              : { display: "none" }
+          }
+        >
+          <svg
+            width={24}
+            height={24}
+            viewBox="0 0 24 24"
+            style={{ cursor: "pointer" }}
+            onClick={() => toggleSideBar()}
           >
             <path d="M13.4 12l5.7-5.7A1 1 0 0017.7 5L12 10.6 6.3 4.9A1 1 0 005 6.3l5.7 5.7L5 17.7A1 1 0 106.3 19l5.7-5.7 5.7 5.7a1 1 0 001.4-1.4z" />
           </svg>
@@ -603,6 +599,7 @@ const Sidebar = ({
             toggleFunction={toggleGenre}
             filters={genreFilters}
             handleFiltersSelect={handleGenreFiltersSelect}
+            isAlreadySelected={isAlreadySelected}
           />
           <FilterItem
             title="Vocals"
@@ -610,13 +607,15 @@ const Sidebar = ({
             toggleFunction={toggleVocal}
             filters={vocalFilters}
             handleFiltersSelect={handleVocalFiltersSelect}
+            isAlreadySelected={isAlreadySelected}
           />
           <FilterItem
-            title="Mood"
+            title="Moods"
             open={openMood}
             toggleFunction={toggleMood}
             filters={moodFilters}
             handleFiltersSelect={handleMoodFiltersSelect}
+            isAlreadySelected={isAlreadySelected}
           />
           <div className="_2StxQ">
             <button
@@ -655,6 +654,7 @@ const Sidebar = ({
             toggleFunction={toggleArtist}
             filters={artistFilters}
             handleFiltersSelect={handleArtistFiltersSelect}
+            isAlreadySelected={isAlreadySelected}
           />
           <FilterItem
             title="Instruments"
@@ -662,6 +662,7 @@ const Sidebar = ({
             toggleFunction={toggleInstrument}
             filters={instrumentFilters}
             handleFiltersSelect={handleInstrumentFiltersSelect}
+            isAlreadySelected={isAlreadySelected}
           />
 
           {/* <div className="_2StxQ">

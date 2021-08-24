@@ -1,12 +1,10 @@
 import React, { useState, useLayoutEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import "./playListAboveFilters.css";
+import queryString from "query-string";
 import { musicConstants } from "../../redux/constants";
-const {  
-  FILTERED_FILTERS,
-  SELECTED_SORT_ITEM
-} = musicConstants;
+const { SELECTED_SORT_ITEM } = musicConstants;
 
 const PlayListAboveFilters = ({
   genreFilters,
@@ -21,9 +19,10 @@ const PlayListAboveFilters = ({
   setInstrumentFilters,
   bpmValue,
   setbpmValue,
-  addDeleteUrl,  
-  toggleSideBar
+  addDeleteUrl,
+  toggleSideBar,
 }) => {
+  let location = useLocation();
   const dispatch = useDispatch();
   const _music = useSelector((state) => state.music);
   let history = useHistory();
@@ -42,164 +41,59 @@ const PlayListAboveFilters = ({
   // eslint-disable-next-line no-unused-vars
   const [width, height] = useWindowSize();
   const [sortOpen, setSortOpen] = useState(false);
-  const showFilters = () => {
-    const isParentInList = (title) => {
-      for (let i = 0; i < _music.filteredFilters.length; i++) {
-        if (_music.filteredFilters[i].filterTitle === title) {
-          return true;
+  const showFilters1 = () => {    
+    
+    const deleteFilter = (filterText) => {
+      let params = queryString.parse(location.search);
+      let newquery = "";
+      let text = filterText;
+      for (let i = 0; i < Object.keys(params).length; i++) {
+        if (Object.keys(params)[i] === "genres") {          
+          if (Array.isArray(params.genres)) {
+            for (let i = 0; i < params.genres.length; i++) {
+              if (params.genres[i] !== text) {
+                newquery += `&genres=${params.genres[i]}`;
+              }
+            }
+          }
+        } else if (Object.keys(params)[i] === "vocals") {          
+          if (Array.isArray(params.vocals)) {
+            for (let i = 0; i < params.vocals.length; i++) {
+              if (params.vocals[i] !== text) {
+                newquery += `&vocals=${params.vocals[i]}`;              
+              }
+            }
+          }
+        } else if (Object.keys(params)[i] === "moods") {
+          if (Array.isArray(params.moods)) {
+            for (let i = 0; i < params.moods.length; i++) {
+              if (params.moods[i] !== text) {                
+                newquery += `&moods=${params.moods[i]}`;
+              }
+            }
+          }
+        }
+        else if (Object.keys(params)[i] === "artists") {          
+          if (Array.isArray(params.artists)) {
+            for (let i = 0; i < params.artists.length; i++) {
+              if (params.artists[i] !== text) {                
+                newquery += `&artists=${params.artists[i]}`;                
+              }
+            }
+          }
+        }
+        else if (Object.keys(params)[i] === "instruments") {
+          console.log(params.instruments);
+          if (Array.isArray(params.instruments)) {
+            for (let i = 0; i < params.instruments.length; i++) {
+              if (params.instruments[i] !== text) {                
+                newquery += `&instruments=${params.instruments[i]}`;                
+              }
+            }
+          }
         }
       }
-      return false;
-    };
-
-    const deleteFilter = (item1) => {      
-      dispatch({ type: FILTERED_FILTERS, payload: _music.filteredFilters.filter((item) => item.filterTitle !== item1.filterTitle) });
-      let query = "";
-      // filterType
-      if (item1.filterType === "genre") {
-        query = addDeleteUrl(item1.filterTitle, false, "genre");
-
-        let tempArray1 = [...genreFilters];
-        for (let i = 0; i < genreFilters.length; i++) {
-          // parent delete
-          if (tempArray1[i].filterText === item1.filterTitle) {
-            tempArray1[i] = { ...tempArray1[i], filtered: false };
-          }
-          if (genreFilters[i].subFilters) {
-            for (let j = 0; j < genreFilters[i].subFilters.length; j++) {
-              // child delete
-              if (
-                genreFilters[i].subFilters[j].filterText === item1.filterTitle
-              ) {
-                if (!isParentInList(genreFilters[i].filterText)) {
-                  tempArray1[i] = { ...tempArray1[i], filtered: false };
-                }
-
-                tempArray1[i].subFilters[j] = {
-                  ...tempArray1[i].subFilters[j],
-                  filtered: false,
-                };
-              }
-            }
-          }
-        }
-        setGenreFilters(tempArray1);
-      } else if (item1.filterType === "vocal") {
-        query = addDeleteUrl(item1.filterTitle, false, "vocal");
-        let tempArray1 = [...vocalFilters];
-        for (let i = 0; i < vocalFilters.length; i++) {
-          // parent delete
-          if (tempArray1[i].filterText === item1.filterTitle) {
-            tempArray1[i] = { ...tempArray1[i], filtered: false };
-          }
-          if (vocalFilters[i].subFilters) {
-            for (let j = 0; j < vocalFilters[i].subFilters.length; j++) {
-              // child delete
-              if (
-                vocalFilters[i].subFilters[j].filterText === item1.filterTitle
-              ) {
-                if (!isParentInList(vocalFilters[i].filterText)) {
-                  tempArray1[i] = { ...tempArray1[i], filtered: false };
-                }
-
-                tempArray1[i].subFilters[j] = {
-                  ...tempArray1[i].subFilters[j],
-                  filtered: false,
-                };
-              }
-            }
-          }
-        }
-        setVocalFilters(tempArray1);
-      } else if (item1.filterType === "mood") {
-        query = addDeleteUrl(item1.filterTitle, false, "mood");
-        let tempArray1 = [...moodFilters];
-        for (let i = 0; i < moodFilters.length; i++) {
-          // parent delete
-          if (tempArray1[i].filterText === item1.filterTitle) {
-            tempArray1[i] = { ...tempArray1[i], filtered: false };
-          }
-          if (moodFilters[i].subFilters) {
-            for (let j = 0; j < moodFilters[i].subFilters.length; j++) {
-              // child delete
-              if (
-                moodFilters[i].subFilters[j].filterText === item1.filterTitle
-              ) {
-                if (!isParentInList(moodFilters[i].filterText)) {
-                  tempArray1[i] = { ...tempArray1[i], filtered: false };
-                }
-
-                tempArray1[i].subFilters[j] = {
-                  ...tempArray1[i].subFilters[j],
-                  filtered: false,
-                };
-              }
-            }
-          }
-        }
-        setMoodFilters(tempArray1);
-      } else if (item1.filterType === "artist") {
-        query = addDeleteUrl(item1.filterTitle, false, "artist");
-        let tempArray1 = [...artistFilters];
-        for (let i = 0; i < artistFilters.length; i++) {
-          // parent delete
-          if (tempArray1[i].filterText === item1.filterTitle) {
-            tempArray1[i] = { ...tempArray1[i], filtered: false };
-          }
-          if (artistFilters[i].subFilters) {
-            for (let j = 0; j < artistFilters[i].subFilters.length; j++) {
-              // child delete
-              if (
-                artistFilters[i].subFilters[j].filterText === item1.filterTitle
-              ) {
-                if (!isParentInList(artistFilters[i].filterText)) {
-                  tempArray1[i] = { ...tempArray1[i], filtered: false };
-                }
-
-                tempArray1[i].subFilters[j] = {
-                  ...tempArray1[i].subFilters[j],
-                  filtered: false,
-                };
-              }
-            }
-          }
-        }
-        setArtistFilters(tempArray1);
-      } else if (item1.filterType === "instrument") {
-        query = addDeleteUrl(item1.filterTitle, false, "instrument");
-        let tempArray1 = [...instrumentFilters];
-        for (let i = 0; i < instrumentFilters.length; i++) {
-          // parent delete
-          if (tempArray1[i].filterText === item1.filterTitle) {
-            tempArray1[i] = { ...tempArray1[i], filtered: false };
-          }
-          if (instrumentFilters[i].subFilters) {
-            for (let j = 0; j < instrumentFilters[i].subFilters.length; j++) {
-              // child delete
-              if (
-                instrumentFilters[i].subFilters[j].filterText ===
-                item1.filterTitle
-              ) {
-                if (!isParentInList(instrumentFilters[i].filterText)) {
-                  tempArray1[i] = { ...tempArray1[i], filtered: false };
-                }
-
-                tempArray1[i].subFilters[j] = {
-                  ...tempArray1[i].subFilters[j],
-                  filtered: false,
-                };
-              }
-            }
-          }
-        }
-        setInstrumentFilters(tempArray1);
-      }
-
-      if (_music.filteredFilters.length > 1) {
-        history.push(`/royalty-free-music?${query}`);
-      } else {
-        history.push(`/royalty-free-music`);
-      }
+      history.push(`/royalty-free-music?${newquery}`);
     };
 
     const showNpmFilters = () => {
@@ -226,34 +120,254 @@ const PlayListAboveFilters = ({
       }
     };
 
-    return (
-      <div className="_1Aitw _3zBs1">
-        {_music.filteredFilters.length > 0
-          ? _music.filteredFilters.map((item, i) => (
+    const showFilters = () => {
+      let fA = [];
+      let params = queryString.parse(location.search);
+      for (let i = 0; i < Object.keys(params).length; i++) {
+        if (Object.keys(params)[i] === "genres") {
+          if (Array.isArray(params.genres)) {
+            for (let i = 0; i < params.genres.length; i++) {
+              fA.push(
+                <span
+                  data-e2e="activeFilter_mood_action-adventure"
+                  className="P8Lj3 _1RWxw _1hnuK C70yO _1eRGl"
+                  href="/"
+                  key={i}
+                >
+                  <span className="h0Y4E">
+                    {params.genres[i].split("-").join(" ")}
+                  </span>
+                  <svg
+                    width={16}
+                    height={16}
+                    viewBox="0 0 16 16"
+                    onClick={() => deleteFilter(params.genres[i])}
+                  >
+                    <path d="M9.4 8l3.3-3.3a1 1 0 00-1.4-1.4L8 6.6 4.7 3.3a1 1 0 00-1.4 1.4L6.6 8l-3.3 3.3a1 1 0 101.4 1.4L8 9.4l3.3 3.3a1 1 0 001.4-1.4z" />
+                  </svg>
+                </span>
+              );
+            }
+          } else {
+            fA.push(
               <span
                 data-e2e="activeFilter_mood_action-adventure"
                 className="P8Lj3 _1RWxw _1hnuK C70yO _1eRGl"
                 href="/"
                 key={i}
               >
-                <span className="h0Y4E">{item.filterTitle}</span>
+                <span className="h0Y4E">
+                  {params.genres.split("-").join(" ")}
+                </span>
                 <svg
                   width={16}
                   height={16}
                   viewBox="0 0 16 16"
-                  onClick={() => deleteFilter(item)}
+                  onClick={() => deleteFilter(params.genres)}
                 >
                   <path d="M9.4 8l3.3-3.3a1 1 0 00-1.4-1.4L8 6.6 4.7 3.3a1 1 0 00-1.4 1.4L6.6 8l-3.3 3.3a1 1 0 101.4 1.4L8 9.4l3.3 3.3a1 1 0 001.4-1.4z" />
                 </svg>
               </span>
-            ))
-          : null}
+            );
+          }
+        } else if (Object.keys(params)[i] === "vocals") {
+          if (Array.isArray(params.vocals)) {
+            for (let i = 0; i < params.vocals.length; i++) {
+              fA.push(
+                <span
+                  data-e2e="activeFilter_mood_action-adventure"
+                  className="P8Lj3 _1RWxw _1hnuK C70yO _1eRGl"
+                  href="/"
+                  key={i}
+                >
+                  <span className="h0Y4E">
+                    {params.vocals[i].split("-").join(" ")}
+                  </span>
+                  <svg
+                    width={16}
+                    height={16}
+                    viewBox="0 0 16 16"
+                    onClick={() => deleteFilter(params.vocals[i])}
+                  >
+                    <path d="M9.4 8l3.3-3.3a1 1 0 00-1.4-1.4L8 6.6 4.7 3.3a1 1 0 00-1.4 1.4L6.6 8l-3.3 3.3a1 1 0 101.4 1.4L8 9.4l3.3 3.3a1 1 0 001.4-1.4z" />
+                  </svg>
+                </span>
+              );
+            }
+          } else {
+            fA.push(
+              <span
+                data-e2e="activeFilter_mood_action-adventure"
+                className="P8Lj3 _1RWxw _1hnuK C70yO _1eRGl"
+                href="/"
+                key={i}
+              >
+                <span className="h0Y4E">
+                  {params.vocals.split("-").join(" ")}
+                </span>
+                <svg
+                  width={16}
+                  height={16}
+                  viewBox="0 0 16 16"
+                  onClick={() => deleteFilter(params.vocals)}
+                >
+                  <path d="M9.4 8l3.3-3.3a1 1 0 00-1.4-1.4L8 6.6 4.7 3.3a1 1 0 00-1.4 1.4L6.6 8l-3.3 3.3a1 1 0 101.4 1.4L8 9.4l3.3 3.3a1 1 0 001.4-1.4z" />
+                </svg>
+              </span>
+            );
+          }
+        } else if (Object.keys(params)[i] === "moods") {
+          if (Array.isArray(params.moods)) {
+            for (let i = 0; i < params.moods.length; i++) {
+              fA.push(
+                <span
+                  data-e2e="activeFilter_mood_action-adventure"
+                  className="P8Lj3 _1RWxw _1hnuK C70yO _1eRGl"
+                  href="/"
+                  key={i}
+                >
+                  <span className="h0Y4E">
+                    {params.moods[i].split("-").join(" ")}
+                  </span>
+                  <svg
+                    width={16}
+                    height={16}
+                    viewBox="0 0 16 16"
+                    onClick={() => deleteFilter(params.moods[i])}
+                  >
+                    <path d="M9.4 8l3.3-3.3a1 1 0 00-1.4-1.4L8 6.6 4.7 3.3a1 1 0 00-1.4 1.4L6.6 8l-3.3 3.3a1 1 0 101.4 1.4L8 9.4l3.3 3.3a1 1 0 001.4-1.4z" />
+                  </svg>
+                </span>
+              );
+            }
+          } else {
+            fA.push(
+              <span
+                data-e2e="activeFilter_mood_action-adventure"
+                className="P8Lj3 _1RWxw _1hnuK C70yO _1eRGl"
+                href="/"
+                key={i}
+              >
+                <span className="h0Y4E">
+                  {params.moods.split("-").join(" ")}
+                </span>
+                <svg
+                  width={16}
+                  height={16}
+                  viewBox="0 0 16 16"
+                  onClick={() => deleteFilter(params.moods)}
+                >
+                  <path d="M9.4 8l3.3-3.3a1 1 0 00-1.4-1.4L8 6.6 4.7 3.3a1 1 0 00-1.4 1.4L6.6 8l-3.3 3.3a1 1 0 101.4 1.4L8 9.4l3.3 3.3a1 1 0 001.4-1.4z" />
+                </svg>
+              </span>
+            );
+          }
+        } else if (Object.keys(params)[i] === "artists") {
+          if (Array.isArray(params.artists)) {
+            for (let i = 0; i < params.artists.length; i++) {
+              fA.push(
+                <span
+                  data-e2e="activeFilter_mood_action-adventure"
+                  className="P8Lj3 _1RWxw _1hnuK C70yO _1eRGl"
+                  href="/"
+                  key={i}
+                >
+                  <span className="h0Y4E">
+                    {params.artists[i].split("-").join(" ")}
+                  </span>
+                  <svg
+                    width={16}
+                    height={16}
+                    viewBox="0 0 16 16"
+                    onClick={() => deleteFilter(params.artists[i])}
+                  >
+                    <path d="M9.4 8l3.3-3.3a1 1 0 00-1.4-1.4L8 6.6 4.7 3.3a1 1 0 00-1.4 1.4L6.6 8l-3.3 3.3a1 1 0 101.4 1.4L8 9.4l3.3 3.3a1 1 0 001.4-1.4z" />
+                  </svg>
+                </span>
+              );
+            }
+          } else {
+            fA.push(
+              <span
+                data-e2e="activeFilter_mood_action-adventure"
+                className="P8Lj3 _1RWxw _1hnuK C70yO _1eRGl"
+                href="/"
+                key={i}
+              >
+                <span className="h0Y4E">
+                  {params.artists.split("-").join(" ")}
+                </span>
+                <svg
+                  width={16}
+                  height={16}
+                  viewBox="0 0 16 16"
+                  onClick={() => deleteFilter(params.artists)}
+                >
+                  <path d="M9.4 8l3.3-3.3a1 1 0 00-1.4-1.4L8 6.6 4.7 3.3a1 1 0 00-1.4 1.4L6.6 8l-3.3 3.3a1 1 0 101.4 1.4L8 9.4l3.3 3.3a1 1 0 001.4-1.4z" />
+                </svg>
+              </span>
+            );
+          }
+        } else if (Object.keys(params)[i] === "instruments") {
+          if (Array.isArray(params.instruments)) {
+            for (let i = 0; i < params.instruments.length; i++) {
+              fA.push(
+                <span
+                  data-e2e="activeFilter_mood_action-adventure"
+                  className="P8Lj3 _1RWxw _1hnuK C70yO _1eRGl"
+                  href="/"
+                  key={i}
+                >
+                  <span className="h0Y4E">
+                    {params.instruments[i].split("-").join(" ")}
+                  </span>
+                  <svg
+                    width={16}
+                    height={16}
+                    viewBox="0 0 16 16"
+                    onClick={() => deleteFilter(params.instruments[i])}
+                  >
+                    <path d="M9.4 8l3.3-3.3a1 1 0 00-1.4-1.4L8 6.6 4.7 3.3a1 1 0 00-1.4 1.4L6.6 8l-3.3 3.3a1 1 0 101.4 1.4L8 9.4l3.3 3.3a1 1 0 001.4-1.4z" />
+                  </svg>
+                </span>
+              );
+            }
+          } else {
+            fA.push(
+              <span
+                data-e2e="activeFilter_mood_action-adventure"
+                className="P8Lj3 _1RWxw _1hnuK C70yO _1eRGl"
+                href="/"
+                key={i}
+              >
+                <span className="h0Y4E">
+                  {params.instruments.split("-").join(" ")}
+                </span>
+                <svg
+                  width={16}
+                  height={16}
+                  viewBox="0 0 16 16"
+                  onClick={() => deleteFilter(params.instruments)}
+                >
+                  <path d="M9.4 8l3.3-3.3a1 1 0 00-1.4-1.4L8 6.6 4.7 3.3a1 1 0 00-1.4 1.4L6.6 8l-3.3 3.3a1 1 0 101.4 1.4L8 9.4l3.3 3.3a1 1 0 001.4-1.4z" />
+                </svg>
+              </span>
+            );
+          }
+        }
+      }      
+      return fA;
+    };
+
+    return (
+      <div className="_1Aitw _3zBs1">        
+        {showFilters()}
         {showNpmFilters()}
       </div>
     );
   };
 
-  const handleSortSelect = (selected) => {    
+  const handleSortSelect = (selected) => {
     dispatch({ type: SELECTED_SORT_ITEM, payload: selected });
     setSortOpen(false);
   };
@@ -272,7 +386,7 @@ const PlayListAboveFilters = ({
           className="P8Lj3 _1RWxw _1hnuK C70yO _2cfsN"
           type="button"
           style={width >= 768 ? { display: "none" } : null}
-          onClick={() =>toggleSideBar()}
+          onClick={() => toggleSideBar()}
         >
           <span>
             <svg width={24} height={24} viewBox="0 0 24 24">
@@ -521,8 +635,9 @@ const PlayListAboveFilters = ({
             </div>
           </div>
         </div>
-        <div className="_3fyuh _1tUb_"
-        style={width <= 768 ? { display: "none" } : null}
+        <div
+          className="_3fyuh _1tUb_"
+          style={width <= 768 ? { display: "none" } : null}
         >
           <div className="_16jqA">
             <button
@@ -569,8 +684,8 @@ const PlayListAboveFilters = ({
         </div>
 
         <div className="_3Qz8C">
-          {showFilters()}
-          <br/>
+          {showFilters1()}
+          <br />
           {showListing()}
         </div>
       </div>

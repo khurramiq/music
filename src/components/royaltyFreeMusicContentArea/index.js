@@ -4,11 +4,15 @@ import PlayListAboveFilters from "../playListAboveFilters";
 import PlayListHeader from "../playListHeader";
 import PlayListItem from "../playListItem";
 import ListNavigation from "../playlistNavigation";
+// import { useLocation } from 'react-router-dom';
 import Sidebar from "../sidebar";
 import { useSelector } from "react-redux";
+import queryString from "query-string";
 import "./royaltyFreeMusicContentArea.css";
+import { useLocation } from "react-router-dom";
 
-const RoyaltyFreeMusicContentArea = ({ openSideBar, toggleSideBar }) => {  
+const RoyaltyFreeMusicContentArea = ({ openSideBar, toggleSideBar }) => {
+  let location = useLocation();
   const _music = useSelector((state) => state.music);
   // eslint-disable-next-line no-unused-vars
   const [showSoundCloud, setShowSoundCloud] = useState(false);
@@ -419,45 +423,145 @@ const RoyaltyFreeMusicContentArea = ({ openSideBar, toggleSideBar }) => {
       artist: "Black Rhomb",
       instrument: "Cello",
     },
-  ]);  
+  ]);
+
+  function capitalizeTheFirstLetterOfEachWord(words) {
+    var separateWord = words.toLowerCase().split(" ");
+    for (var i = 0; i < separateWord.length; i++) {
+      separateWord[i] =
+        separateWord[i].charAt(0).toUpperCase() + separateWord[i].substring(1);
+    }
+    return separateWord.join(" ");
+  }  
 
   const showMusicList = () => {
+    let params = queryString.parse(location.search);
     let newMusicList = [];
     if (
-      _music.filteredFilters.length > 0 ||
+      Object.keys(params).length > 0 ||
       parseInt(bpmValue[0]) !== 0 ||
       parseInt(bpmValue[1]) !== 250
     ) {
-      for (let i = 0; i < _music.filteredFilters.length; i++) {
-        if (_music.filteredFilters[i].filterType === "genre") {
+      for (let i = 0; i < Object.keys(params).length; i++) {
+        if (Object.keys(params)[i] === "genres") {
           for (let j = 0; j < musicList.length; j++) {
-            if (musicList[j].genre === _music.filteredFilters[i].filterTitle) {
-              newMusicList.push(musicList[j]);
-            }
+            if (Array.isArray(params.genres)) {
+              for (let k = 0; k < params.genres.length; k++) {
+                if (
+                  musicList[j].genre ===
+                  capitalizeTheFirstLetterOfEachWord(
+                    params.genres[k].replace(/-/g, " ")
+                  )
+                ) {
+                  newMusicList.push(musicList[j]);
+                } 
+              }              
+            } else {
+              if (
+                musicList[j].genre ===
+                capitalizeTheFirstLetterOfEachWord(
+                  params.genres.replace(/-/g, " ")
+                )
+              ) {
+                newMusicList.push(musicList[j]);
+              } 
+            }            
           }
-        } else if (_music.filteredFilters[i].filterType === "vocal") {
+        } else if (Object.keys(params)[i] === "vocals") {
           for (let j = 0; j < musicList.length; j++) {
-            if (musicList[j].vocal === _music.filteredFilters[i].filterTitle) {
-              newMusicList.push(musicList[j]);
-            }
+            if (Array.isArray(params.vocals)) {
+              for (let k = 0; k < params.vocals.length; k++) {
+                if (
+                  musicList[j].vocal ===
+                  capitalizeTheFirstLetterOfEachWord(
+                    params.vocals[k].replace(/-/g, " ")
+                  )
+                ) {
+                  newMusicList.push(musicList[j]);
+                } 
+              }              
+            } else {
+              if (
+                musicList[j].vocal ===
+                capitalizeTheFirstLetterOfEachWord(
+                  params.vocals.replace(/-/g, " ")
+                )
+              ) {
+                newMusicList.push(musicList[j]);
+              } 
+            }            
           }
-        } else if (_music.filteredFilters[i].filterType === "mood") {
+        } else if (Object.keys(params)[i] === "moods") {
           for (let j = 0; j < musicList.length; j++) {
-            if (musicList[j].mood === _music.filteredFilters[i].filterTitle) {
-              newMusicList.push(musicList[j]);
-            }
+            if (Array.isArray(params.moods)) {
+              for (let k = 0; k < params.moods.length; k++) {
+                if (
+                  musicList[j].mood ===
+                  capitalizeTheFirstLetterOfEachWord(
+                    params.moods[k].replace(/-/g, " ")
+                  )
+                ) {
+                  newMusicList.push(musicList[j]);
+                } 
+              }              
+            } else {
+              if (
+                musicList[j].mood ===
+                capitalizeTheFirstLetterOfEachWord(
+                  params.moods.replace(/-/g, " ")
+                )
+              ) {
+                newMusicList.push(musicList[j]);
+              } 
+            }            
           }
-        } else if (_music.filteredFilters[i].filterType === "artist") {
+        } else if (Object.keys(params)[i] === "artists") {          
           for (let j = 0; j < musicList.length; j++) {
-            if (musicList[j].artist === _music.filteredFilters[i].filterTitle) {
-              newMusicList.push(musicList[j]);
-            }
+            if (Array.isArray(params.artists)) {
+              for (let k = 0; k < params.artists.length; k++) {
+                if (
+                  musicList[j].artist ===
+                  capitalizeTheFirstLetterOfEachWord(
+                    params.artists[k].replace(/-/g, " ")
+                  )
+                ) {
+                  newMusicList.push(musicList[j]);
+                } 
+              }              
+            } else {
+              if (
+                musicList[j].artist ===
+                capitalizeTheFirstLetterOfEachWord(
+                  params.artists.replace(/-/g, " ")
+                )
+              ) {
+                newMusicList.push(musicList[j]);
+              } 
+            }            
           }
-        } else if (_music.filteredFilters[i].filterType === "instrument") {
+        } else if (Object.keys(params)[i] === "instruments") {          
           for (let j = 0; j < musicList.length; j++) {
-            if (musicList[j].instrument === _music.filteredFilters[i].filterTitle) {
-              newMusicList.push(musicList[j]);
-            }
+            if (Array.isArray(params.instruments)) {
+              for (let k = 0; k < params.instruments.length; k++) {
+                if (
+                  musicList[j].instrument ===
+                  capitalizeTheFirstLetterOfEachWord(
+                    params.instruments[k].replace(/-/g, " ")
+                  )
+                ) {
+                  newMusicList.push(musicList[j]);
+                } 
+              }              
+            } else {
+              if (
+                musicList[j].instrument ===
+                capitalizeTheFirstLetterOfEachWord(
+                  params.instruments.replace(/-/g, " ")
+                )
+              ) {
+                newMusicList.push(musicList[j]);
+              } 
+            }            
           }
         }
       }
@@ -475,7 +579,7 @@ const RoyaltyFreeMusicContentArea = ({ openSideBar, toggleSideBar }) => {
 
       const uniqueArray = newMusicList.filter(
         (v, i, a) => a.findIndex((t) => t.title === v.title) === i
-      );      
+      );
       if (_music.selectedSortItem === "Artist") {
         return musicList
           .sort((a, b) =>
@@ -522,7 +626,7 @@ const RoyaltyFreeMusicContentArea = ({ openSideBar, toggleSideBar }) => {
       return uniqueArray.map((music, i) => (
         <PlayListItem music={music} setShowSoundCloud={setShowSoundCloud} />
       ));
-    } else {      
+    } else {
       if (_music.selectedSortItem === "Artist") {
         return musicList
           .sort((a, b) =>
@@ -614,7 +718,7 @@ const RoyaltyFreeMusicContentArea = ({ openSideBar, toggleSideBar }) => {
     <>
       <div className="_271bo">
         <Sidebar
-          openSideBar={openSideBar}                    
+          openSideBar={openSideBar}
           genreFilters={genreFilters}
           setGenreFilters={setGenreFilters}
           vocalFilters={vocalFilters}
@@ -633,7 +737,7 @@ const RoyaltyFreeMusicContentArea = ({ openSideBar, toggleSideBar }) => {
 
         {/* PLAY MUSIC LIST START */}
         <div className="_1aM3x">
-          <PlayListAboveFilters            
+          <PlayListAboveFilters
             genreFilters={genreFilters}
             setGenreFilters={setGenreFilters}
             vocalFilters={vocalFilters}
@@ -646,7 +750,7 @@ const RoyaltyFreeMusicContentArea = ({ openSideBar, toggleSideBar }) => {
             setInstrumentFilters={setInstrumentFilters}
             bpmValue={bpmValue}
             setbpmValue={setbpmValue}
-            addDeleteUrl={addDeleteUrl}            
+            addDeleteUrl={addDeleteUrl}
             toggleSideBar={toggleSideBar}
           />
 
@@ -657,14 +761,14 @@ const RoyaltyFreeMusicContentArea = ({ openSideBar, toggleSideBar }) => {
           <ListNavigation />
         </div>
         {/* PLAY MUSIC LIST END */}
-      </div>            
+      </div>
       <iframe
         style={
           showSoundCloud
             ? { position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 1 }
             : { display: "none" }
         }
-        id="sc-widget"              
+        id="sc-widget"
         src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/users/1539950/favorites"
         width="100%"
         height={100}

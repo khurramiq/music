@@ -7,6 +7,7 @@ const FilterItem = ({
   title,
   filters,
   handleFiltersSelect,
+  isAlreadySelected,
 }) => {
   const showFilters = (filters) => {
     if (filters.length > 0) {
@@ -27,7 +28,13 @@ const FilterItem = ({
                   }
                 >
                   <span className="sidebar_link ZZ-fz _3Vzoe" href="/">
-                    <span className={item.filtered ? "bNcwi GTtEX" : "bNcwi"} />
+                    <span
+                      className={
+                        isAlreadySelected(item.filterText, title.toLowerCase())
+                          ? "bNcwi GTtEX"
+                          : "bNcwi"
+                      }
+                    />
                     <span>
                       {item.filterText}{" "}
                       <span className="_22hsR">{item.moodNumber}</span>
@@ -49,7 +56,7 @@ const FilterItem = ({
                         <span className="sidebar_link ZZ-fz _3Vzoe" href="/">
                           <span
                             className={
-                              subitem.filtered ? "bNcwi GTtEX" : "bNcwi"
+                              isAlreadySelected(subitem.filterText, title.toLowerCase()) ? "bNcwi GTtEX" : "bNcwi"
                             }
                           />
                           <span>
